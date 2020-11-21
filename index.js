@@ -3,6 +3,7 @@ const bot = new Discord.Client();
 
 const config = require("./config.json");
 const ytdl = require("ytdl-core");
+const cron = require("node-cron");
 
 const waterImg = new Discord.MessageAttachment(
   "./images/drink-water.png",
@@ -14,29 +15,45 @@ let servers = {};
 bot.on("ready", () => {
   console.log("NuggetBot is online!");
 
-  // HYDRO HOMIES
+  // // drink-water channel
+  // const channel = bot.channels.cache.get("715952134960447508");
+  // // hydro homies role
+  // const roleId = "715952532068761614";
 
+  // let date = new Date();
+  // let hour = date.getHours();
+
+  // if (hour > 12) {
+  //   hour -= 12;
+  // } else if (hour === 0) {
+  //   hour = 12;
+  // }
+
+  // if (hour % 3 === 0) {
+  //   channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`);
+  //   channel.send({ files: [waterImg] });
+
+  //   // channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`);
+  //   // channel.send({ files: [waterImg] });
+  // }
+});
+
+//random hour between 3 and 5 hours
+let randomInt = (Math.floor(Math.random() * 5) + 3).toString();
+// between 10am and 11pm on 30mins of the hour, on the 3-5th (random) hour
+let cronTime = "30 10-23/" + randomInt + " * * *";
+
+cron.schedule(cronTime, () => {
+  // HYDRO HOMIES
   // drink-water channel
   const channel = bot.channels.cache.get("715952134960447508");
   // hydro homies role
   const roleId = "715952532068761614";
-
-  let date = new Date();
-  let hour = date.getHours();
-
-  if (hour > 12) {
-    hour -= 12;
-  } else if (hour === 0) {
-    hour = 12;
-  }
-
-  if (hour % 3 === 0) {
-    channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`);
-    channel.send({ files: [waterImg] });
-  }
+  channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`);
+  channel.send({ files: [waterImg] });
 });
 
-// Nugghelp
+// Help Command
 bot.on("message", (message) => {
   if (message.content.charAt(0) === config.prefix) {
     let args = message.content.substring(config.prefix.length).split(" ");
@@ -118,7 +135,7 @@ bot.on("message", (message) => {
       case "nuggstop":
         if (message.guild.me.voice.channel) {
           message.guild.me.voice.channel.leave();
-          message.channel.send("Nuggetbot disconnected");
+          message.channel.send("NuggetBot disconnected");
         }
         break;
     }
