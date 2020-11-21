@@ -14,33 +14,12 @@ let servers = {};
 
 bot.on("ready", () => {
   console.log("NuggetBot is online!");
-
-  // // drink-water channel
-  // const channel = bot.channels.cache.get("715952134960447508");
-  // // hydro homies role
-  // const roleId = "715952532068761614";
-
-  // let date = new Date();
-  // let hour = date.getHours();
-
-  // if (hour > 12) {
-  //   hour -= 12;
-  // } else if (hour === 0) {
-  //   hour = 12;
-  // }
-
-  // if (hour % 3 === 0) {
-  //   channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`);
-  //   channel.send({ files: [waterImg] });
-
-  //   // channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`);
-  //   // channel.send({ files: [waterImg] });
-  // }
 });
 
+// Water Reminder
 //random hour between 3 and 5 hours
 let randomInt = (Math.floor(Math.random() * 5) + 3).toString();
-// between 10am and 11pm on 30mins of the hour, on the 3-5th (random) hour
+// between 10am and 11pm on 30mins of the hour, every 3-5 (random) hours
 let cronTime = "30 10-23/" + randomInt + " * * *";
 
 cron.schedule(cronTime, () => {
@@ -84,31 +63,31 @@ bot.on("message", (message) => {
 });
 
 bot.on("message", (message) => {
-  var ytRegex = /(^(http|https):\/\/(www.)?(youtube.com).*)/;
+  var ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be).*)/;
 
   if (message.content.charAt(0) === config.prefix) {
     let args = message.content.substring(config.prefix.length).split(" ");
 
+    const play = (connection, message) => {
+      let playServer = servers[message.guild.id];
+
+      playServer.dispatcher = connection.play(
+        ytdl(playServer.queue[0], { filter: "audioonly" })
+      );
+
+      playServer.queue.shift();
+
+      playServer.dispatcher.on("finish", function () {
+        if (playServer.queue[0]) {
+          play(connection, message);
+        } else {
+          connection.disconnect();
+        }
+      });
+    };
+
     switch (args[0]) {
       case "nuggplay":
-        const play = (connection, message) => {
-          var server = servers[message.guild.id];
-
-          server.dispatcher = connection.play(
-            ytdl(server.queue[0], { filter: "audioonly" })
-          );
-
-          server.queue.shift();
-
-          server.dispatcher.on("finish", function () {
-            if (server.queue[0]) {
-              play(connection, message);
-            } else {
-              connection.disconnect();
-            }
-          });
-        };
-
         if (!args[1] || !ytRegex.test(args[1])) {
           message.reply("You need to provide a valid Youtube link!");
           return;
@@ -122,12 +101,36 @@ bot.on("message", (message) => {
             queue: [],
           };
 
-        let server = servers[message.guild.id];
+        let server1 = servers[message.guild.id];
 
-        server.queue.push(args[1]);
+        server1.queue.push(args[1]);
 
         if (!message.member.voice.connection)
           message.member.voice.channel.join().then((connection) => {
+            play(connection, message);
+          });
+
+        break;
+      case "playchan1":
+        if (!args[1] || !ytRegex.test(args[1])) {
+          message.reply("You need to provide a valid Youtube link!");
+          return;
+        }
+
+        if (!servers[message.guild.id])
+          servers[message.guild.id] = {
+            queue: [],
+          };
+
+        let server2 = servers[message.guild.id];
+
+        server2.queue.push(args[1]);
+
+        const channel = bot.channels.cache.get("715948266793074802");
+        console.log(channel);
+
+        if (!message.member.voice.connection)
+          channel.join().then((connection) => {
             play(connection, message);
           });
 
