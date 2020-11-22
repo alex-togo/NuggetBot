@@ -4,6 +4,7 @@ const bot = new Discord.Client();
 const config = require("./config.json");
 const ytdl = require("ytdl-core");
 const cron = require("node-cron");
+require("dotenv").config({ path: "./config/keys.env" });
 
 const waterImg = new Discord.MessageAttachment(
   "./images/drink-water.png",
@@ -36,8 +37,8 @@ cron.schedule(cronTime, () => {
 
 // Help Command
 bot.on("message", (message) => {
-  if (message.content.charAt(0) === config.prefix) {
-    let args = message.content.substring(config.prefix.length).split(" ");
+  if (message.content.charAt(0) === process.env.PREFIX) {
+    let args = message.content.substring(process.env.PREFIX.length).split(" ");
 
     if (args[0] === "nugghelp" && args.length === 1) {
       const msg = new Discord.MessageEmbed()
@@ -56,7 +57,7 @@ bot.on("message", (message) => {
 // Secret Commands
 bot.on("message", (message) => {
   if (message.content.charAt(0) === "!") {
-    let args = message.content.substring(config.prefix.length).split(" ");
+    let args = message.content.substring(process.env.PREFIX.length).split(" ");
 
     switch (args[0]) {
       case "mufasa":
@@ -86,8 +87,8 @@ bot.on("message", (message) => {
 bot.on("message", (message) => {
   let ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be).*)/;
 
-  if (message.content.charAt(0) === config.prefix) {
-    let args = message.content.substring(config.prefix.length).split(" ");
+  if (message.content.charAt(0) === process.env.PREFIX) {
+    let args = message.content.substring(process.env.PREFIX.length).split(" ");
 
     const play = (connection, message) => {
       let playServer = servers[message.guild.id];
@@ -177,4 +178,4 @@ bot.on("message", (message) => {
   }
 });
 
-bot.login(config.token);
+bot.login(process.env.TOKEN);
