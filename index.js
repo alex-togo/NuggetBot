@@ -41,8 +41,9 @@ bot.on("message", (message) => {
       const msg = new Discord.MessageEmbed()
         .setTitle("Valid Commands:")
         .setColor(0xffc300).setDescription(`
-        !nuggplay to play music from a youtube video link
-        !nuggstop to disconnect the bot from the voice channel
+        -- !nuggplay youtube link -- to play music from a youtube video link
+        -- !nuggstop -- to disconnect the bot from the voice channel
+        -- !playchan Channel Name youtube link -- to play a youtube link in any channel without having to be in the channel
       `);
       message.channel.send(msg);
     }
@@ -62,8 +63,9 @@ bot.on("message", (message) => {
   }
 });
 
+// Main Music Command
 bot.on("message", (message) => {
-  var ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be).*)/;
+  let ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be).*)/;
 
   if (message.content.charAt(0) === config.prefix) {
     let args = message.content.substring(config.prefix.length).split(" ");
@@ -105,14 +107,42 @@ bot.on("message", (message) => {
 
         server1.queue.push(args[1]);
 
-        if (!message.member.voice.connection)
+        if (!message.member.voice.connection) {
           message.member.voice.channel.join().then((connection) => {
             play(connection, message);
           });
-
+        }
         break;
-      case "playchan1":
-        if (!args[1] || !ytRegex.test(args[1])) {
+      // case "playchan1":
+      //   if (!args[1] || !ytRegex.test(args[1])) {
+      //     message.reply("You need to provide a valid Youtube link!");
+      //     return;
+      //   }
+
+      //   if (!servers[message.guild.id])
+      //     servers[message.guild.id] = {
+      //       queue: [],
+      //     };
+
+      //   let server2 = servers[message.guild.id];
+
+      //   server2.queue.push(args[1]);
+
+      //   const channel = bot.channels.cache.get("715948266793074802");
+
+      //   if (!message.member.voice.connection)
+      //     channel.join().then((connection) => {
+      //       play(connection, message);
+      //     });
+
+      //   break;
+      case "playchan":
+        // get channel name by removing command and yt link (last arg)
+        let channelName = message.content
+          .replace("!playchan", "")
+          .replace(args[args.length - 1], "")
+          .trim();
+        if (!args[args.length - 1] || !ytRegex.test(args[args.length - 1])) {
           message.reply("You need to provide a valid Youtube link!");
           return;
         }
@@ -122,23 +152,24 @@ bot.on("message", (message) => {
             queue: [],
           };
 
-        let server2 = servers[message.guild.id];
+        let server3 = servers[message.guild.id];
 
-        server2.queue.push(args[1]);
+        server3.queue.push(args[args.length - 1]);
 
-        const channel = bot.channels.cache.get("715948266793074802");
-        console.log(channel);
+        const channel2 = message.guild.channels.cache.find(
+          (channel) => channel.name === channelName
+        );
 
         if (!message.member.voice.connection)
-          channel.join().then((connection) => {
+          channel2.join().then((connection) => {
             play(connection, message);
           });
-
         break;
       case "nuggstop":
+        // if bot is in a channel, leave the channel
         if (message.guild.me.voice.channel) {
           message.guild.me.voice.channel.leave();
-          message.channel.send("NuggetBot disconnected");
+          message.channel.send("NuggetBot disconnected.");
         }
         break;
     }
