@@ -1,7 +1,6 @@
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 
-const config = require("./config.json");
 const ytdl = require("ytdl-core");
 const cron = require("node-cron");
 require("dotenv").config({ path: "./config/keys.env" });
