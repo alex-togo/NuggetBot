@@ -28,8 +28,10 @@ cron.schedule(cronTime, () => {
   const channel = bot.channels.cache.get("715952134960447508");
   // hydro homies role
   const roleId = "715952532068761614";
-  channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`);
-  channel.send({ files: [waterImg] });
+  channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
+    files: [waterImg],
+  });
+  // channel.send({ files: [waterImg] });
 });
 
 // Help Command
@@ -39,26 +41,43 @@ bot.on("message", (message) => {
 
     if (args[0] === "nugghelp" && args.length === 1) {
       const msg = new Discord.MessageEmbed()
-        .setTitle("Valid Commands:")
+        .setTitle("NuggetBot Valid Commands:")
         .setColor(0xffc300).setDescription(`
-        -- !nuggplay youtube link -- to play music from a youtube video link
+        -- !nuggplay youtube link -- to play music from a youtube link in your current voice channel
+        -- !playchan Channel Name youtube link -- to play a youtube link in any channel without having to be in the channel (case sensitive)
         -- !nuggstop -- to disconnect the bot from the voice channel
-        -- !playchan Channel Name youtube link -- to play a youtube link in any channel without having to be in the channel
+        -- !secret -- show secret/hidden commands
       `);
       message.channel.send(msg);
     }
   }
 });
 
-// Mufasa Command
+// Secret Commands
 bot.on("message", (message) => {
   if (message.content.charAt(0) === "!") {
     let args = message.content.substring(config.prefix.length).split(" ");
 
-    args = args.map((arg) => arg.toLowerCase());
-
-    if (args[0] === "mufasa" && args.length === 1) {
-      message.channel.send("https://www.youtube.com/watch?v=1AnG04qnLqI");
+    switch (args[0]) {
+      case "mufasa":
+        message.channel.send("https://www.youtube.com/watch?v=1AnG04qnLqI");
+        break;
+      case "secret":
+        message.reply(
+          "LOL you thought I would just give you all the secret commands? YIKES"
+        );
+        break;
+      // case "water":
+      //   // HYDRO HOMIES
+      //   // drink-water channel
+      //   const channel = bot.channels.cache.get("740665206056812677");
+      //   // hydro homies role
+      //   const roleId = "779728231464566825";
+      //   message.channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
+      //     files: [waterImg],
+      //   });
+      //   // channel.send({ files: [waterImg] });
+      //   break;
     }
   }
 });
@@ -113,29 +132,6 @@ bot.on("message", (message) => {
           });
         }
         break;
-      // case "playchan1":
-      //   if (!args[1] || !ytRegex.test(args[1])) {
-      //     message.reply("You need to provide a valid Youtube link!");
-      //     return;
-      //   }
-
-      //   if (!servers[message.guild.id])
-      //     servers[message.guild.id] = {
-      //       queue: [],
-      //     };
-
-      //   let server2 = servers[message.guild.id];
-
-      //   server2.queue.push(args[1]);
-
-      //   const channel = bot.channels.cache.get("715948266793074802");
-
-      //   if (!message.member.voice.connection)
-      //     channel.join().then((connection) => {
-      //       play(connection, message);
-      //     });
-
-      //   break;
       case "playchan":
         // get channel name by removing command and yt link (last arg)
         let channelName = message.content
@@ -160,10 +156,15 @@ bot.on("message", (message) => {
           (channel) => channel.name === channelName
         );
 
-        if (!message.member.voice.connection)
+        if (!message.member.voice.connection && channel2) {
           channel2.join().then((connection) => {
             play(connection, message);
           });
+        } else {
+          message.reply(
+            "Your channel name was not valid. Check casing and spelling."
+          );
+        }
         break;
       case "nuggstop":
         // if bot is in a channel, leave the channel
