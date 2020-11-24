@@ -19,20 +19,25 @@ bot.on("ready", () => {
 // Water Reminder
 //random hour between 3 and 5 hours
 let randomInt = (Math.floor(Math.random() * 5) + 3).toString();
-// between 10am and 11pm on 30mins of the hour, every 3-5 (random) hours
+// between 10am and 11pm on 30mins of the hour, every 3-8 (random) hours
 let cronTime = "30 10-23/" + randomInt + " * * *";
+console.log(cronTime);
 
-cron.schedule(cronTime, () => {
-  // HYDRO HOMIES
-  // drink-water channel
-  const channel = bot.channels.cache.get("715952134960447508");
-  // hydro homies role
-  const roleId = "715952532068761614";
-  channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
-    files: [waterImg],
-  });
-  // channel.send({ files: [waterImg] });
-});
+cron.schedule(
+  cronTime,
+  () => {
+    // HYDRO HOMIES
+    // drink-water channel
+    const channel = bot.channels.cache.get("715952134960447508");
+    // hydro homies role
+    const roleId = "715952532068761614";
+    channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
+      files: [waterImg],
+    });
+    // channel.send({ files: [waterImg] });
+  },
+  { timezone: "America/New_York" }
+);
 
 // Help Command
 bot.on("message", (message) => {
@@ -91,6 +96,7 @@ bot.on("message", (message) => {
 
     const play = (connection, message) => {
       let playServer = servers[message.guild.id];
+      console.log(servers);
 
       playServer.dispatcher = connection.play(
         ytdl(playServer.queue[0], { filter: "audioonly" })
@@ -117,14 +123,16 @@ bot.on("message", (message) => {
           message.reply("You must be in a voice channel to use the bot!");
           return;
         }
+        // if server id not found, clear queue
         if (!servers[message.guild.id])
           servers[message.guild.id] = {
             queue: [],
           };
 
-        let server1 = servers[message.guild.id];
+        console.log(servers);
 
-        server1.queue.push(args[1]);
+        // todo: if server is already in servers object, add to that object not create a new one
+        servers[message.guild.id].queue.push(args[1]);
 
         if (!message.member.voice.connection) {
           message.member.voice.channel.join().then((connection) => {
@@ -148,9 +156,7 @@ bot.on("message", (message) => {
             queue: [],
           };
 
-        let server3 = servers[message.guild.id];
-
-        server3.queue.push(args[args.length - 1]);
+        servers[message.guild.id].queue.push(args[args.length - 1]);
 
         const channel2 = message.guild.channels.cache.find(
           (channel) => channel.name === channelName
