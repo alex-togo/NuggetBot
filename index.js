@@ -17,14 +17,10 @@ bot.on("ready", () => {
 });
 
 // Water Reminder
-//random hour between 3 and 5 hours
-let randomInt = (Math.floor(Math.random() * 5) + 3).toString();
-// between 10am and 11pm on 30mins of the hour, every 3-8 (random) hours
-let cronTime = "30 10-23/" + randomInt + " * * *";
-console.log(cronTime);
 
+// every time cron runs, a new random num between 3-9 is generated for the hour interval
 cron.schedule(
-  cronTime,
+  "* 10-23/" + (Math.floor(Math.random() * 7) + 3).toString() + " * * *",
   () => {
     // HYDRO HOMIES
     // drink-water channel
