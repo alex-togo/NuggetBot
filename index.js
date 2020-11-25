@@ -18,9 +18,9 @@ bot.on("ready", () => {
 
 // Water Reminder
 
-// every time cron runs, a new random num between 3-9 is generated for the hour interval
+// every time cron runs, a new random num between 3-6 is generated for the hour interval
 cron.schedule(
-  `0 10-23/${(Math.floor(Math.random() * 0) + 1).toString()} * * *`,
+  `0 10-23/${(Math.floor(Math.random() * 6) + 3).toString()} * * *`,
   () => {
     // HYDRO HOMIES
     // drink-water channel
