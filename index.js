@@ -20,13 +20,14 @@ bot.on("ready", () => {
 
 // every time cron runs, a new random num between 3-9 is generated for the hour interval
 cron.schedule(
-  "* 10-23/" + (Math.floor(Math.random() * 7) + 3).toString() + " * * *",
+  `* 10-23/${(Math.floor(Math.random() * 7) + 3).toString()} * * *`,
   () => {
     // HYDRO HOMIES
     // drink-water channel
-    const channel = bot.channels.cache.get("715952134960447508");
+    const channel = bot.channels.cache.get("740665206056812676");
     // hydro homies role
     const roleId = "715952532068761614";
+    //<@&${roleId}> \n
     channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
       files: [waterImg],
     });
