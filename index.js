@@ -22,7 +22,7 @@ cron.schedule(
   () => {
     // HYDRO HOMIES
     // drink-water channel
-    const channel = bot.channels.cache.get("740665206056812676");
+    const channel = bot.channels.cache.get("715952134960447508");
     // hydro homies role
     const roleId = "715952532068761614";
 
