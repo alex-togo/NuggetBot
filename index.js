@@ -71,7 +71,7 @@ const play = async (connection, message) => {
 // Main Music Command
 let musicQueue = [];
 
-let ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be).*)/;
+let ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be)\/(watch\?v=)[a-zA-Z0-9_-]{11})/;
 
 bot.on("message", async (message) => {
   if (message.content.charAt(0) === process.env.PREFIX) {
@@ -103,7 +103,9 @@ bot.on("message", async (message) => {
       case "nuggplay":
         //if no second arg or second arg isn't a youtube link
         if (!ytRegex.test(ytGrab)) {
-          message.reply("You need to provide a valid Youtube link!");
+          message.reply(
+            "You need to provide a valid Youtube link! Example: https://www.youtube.com/watch?v=jNQXAC9IVRw"
+          );
           return;
         }
 
