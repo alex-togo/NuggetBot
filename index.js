@@ -71,7 +71,7 @@ const play = async (connection, message) => {
 // Main Music Command
 let musicQueue = [];
 
-let ytRegex = /(^(http|https):\/\/(www|m)\.(youtube\.com|youtu\.be)\/(watch\?v=)?[a-zA-Z0-9_-]{11}$)/;
+let ytRegex = /(^(http|https):\/\/((www|m)\.youtube\.com\/(watch\?v=)?|youtu\.be)\/[a-zA-Z0-9_-]{11}$)/;
 
 bot.on("message", async (message) => {
   if (message.content.charAt(0) === process.env.PREFIX) {
