@@ -17,7 +17,7 @@ bot.on("ready", () => {
 // Water Reminder
 
 //have to put in a default value here or the water reminder won't work
-let randomCronNum = "6";
+let randomCronNum = "13";
 
 // generate random hour between 10-22 for the water reminder cron job at 12am every day
 cron.schedule("0 0 * * *", () => {
