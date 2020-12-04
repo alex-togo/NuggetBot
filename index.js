@@ -16,15 +16,22 @@ bot.on("ready", () => {
 
 // Water Reminder
 
-// every time cron runs, a new random num between 3-8 is generated for the hour interval
+//have to put in a default value here or the water reminder won't work
+let randomCronNum = "6";
+
+// generate random hour between 10-22 for the water reminder cron job at 12am every day
+cron.schedule("0 0 * * *", () => {
+  randomCronNum = (Math.floor(Math.random() * 13) + 10).toString();
+});
+
+// remind users to drink water once every day at a ranom hour between 10am and 10pm
 cron.schedule(
-  `0 10-23/${(Math.floor(Math.random() * 6) + 3).toString()} * * *`,
+  `0 ${randomCronNum} * * *`,
   () => {
-    // HYDRO HOMIES
-    // drink-water channel
-    const channel = bot.channels.cache.get("715952134960447508");
-    // hydro homies role
-    const roleId = "715952532068761614";
+    // channel you want the reminder posted in
+    const channel = bot.channels.cache.get(process.env.CHANNEL);
+    // user role to message
+    const roleId = process.env.ROLE;
 
     channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
       files: [waterImg],
@@ -231,7 +238,7 @@ bot.on("message", (message) => {
         break;
       case "secret":
         message.reply(
-          "LOL you thought I would just give you all the secret commands? YIKES"
+          "LOL you thought I would just give you all the secret commands?"
         );
         break;
     }
