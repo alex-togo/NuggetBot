@@ -16,29 +16,33 @@ bot.on("ready", () => {
 
 // Water Reminder
 
-//have to put in a default value here or the water reminder won't work
-let randomCronNum = "13";
+// placeholder var so first cron1.destroy() works
+var cron1 = cron.schedule("0 0 * * *", () => {
+  console.log("placeholder started");
+});
 
 // generate random hour between 10-22 for the water reminder cron job at 12am every day
 cron.schedule("0 0 * * *", () => {
-  randomCronNum = (Math.floor(Math.random() * 13) + 10).toString();
+  // note: if (cron1){cron1.destroy()} doesn't work, causes too many schedules to start still
+  cron1.destroy();
+  var randomCronNum = (Math.floor(Math.random() * 13) + 10).toString();
+
+  // remind users to drink water once every day at a random hour between 10am and 10pm (10-22)
+  cron1 = cron.schedule(
+    `0 ${randomCronNum} * * *`,
+    () => {
+      // channel you want the reminder posted in
+      const channel = bot.channels.cache.get(process.env.CHANNEL);
+      // user role to message
+      const roleId = process.env.ROLE;
+
+      channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
+        files: [waterImg],
+      });
+    },
+    { timezone: "America/New_York" }
+  );
 });
-
-// remind users to drink water once every day at a ranom hour between 10am and 10pm
-cron.schedule(
-  `0 ${randomCronNum} * * *`,
-  () => {
-    // channel you want the reminder posted in
-    const channel = bot.channels.cache.get(process.env.CHANNEL);
-    // user role to message
-    const roleId = process.env.ROLE;
-
-    channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
-      files: [waterImg],
-    });
-  },
-  { timezone: "America/New_York" }
-);
 
 // -----------------------------------Helper Functions-----------------------------------
 
