@@ -10,6 +10,8 @@ const waterImg = new Discord.MessageAttachment(
   "drink-water.png"
 );
 
+const sdbImg = new Discord.MessageAttachment("./images/sdb.jpg", "sdb.jpg");
+
 bot.on("ready", () => {
   console.log("NuggetBot is online!");
 });
@@ -17,7 +19,7 @@ bot.on("ready", () => {
 // Water Reminder
 
 // placeholder var so first cron1.destroy() works
-var cron1 = cron.schedule("0 0 * * *", () => {
+let cron1 = cron.schedule("0 0 * * *", () => {
   console.log("placeholder started");
 });
 
@@ -25,7 +27,7 @@ var cron1 = cron.schedule("0 0 * * *", () => {
 cron.schedule("0 0 * * *", () => {
   // note: if (cron1){cron1.destroy()} doesn't work, causes too many schedules to start still
   cron1.destroy();
-  var randomCronNum = (Math.floor(Math.random() * 13) + 10).toString();
+  let randomCronNum = (Math.floor(Math.random() * 13) + 10).toString();
 
   // remind users to drink water once every day at a random hour between 10am and 10pm (10-22)
   cron1 = cron.schedule(
@@ -233,6 +235,14 @@ bot.on("message", async (message) => {
 
 // Secret Commands
 bot.on("message", (message) => {
+  let sdbRegex = /(sdb)|(shit damn boys)/;
+
+  if (sdbRegex.test(message.content)) {
+    message.reply({
+      files: [sdbImg],
+    });
+  }
+
   if (message.content.charAt(0) === "!") {
     let args = message.content.substring(process.env.PREFIX.length).split(" ");
 
