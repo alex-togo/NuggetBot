@@ -19,7 +19,7 @@ bot.on("ready", () => {
 // Water Reminder
 
 // placeholder var so first cron1.destroy() works
-let cron1 = cron.schedule("0 0 * * *", () => {
+var cron1 = cron.schedule("0 0 * * *", () => {
   console.log("placeholder started");
 });
 
@@ -27,9 +27,10 @@ let cron1 = cron.schedule("0 0 * * *", () => {
 cron.schedule("0 0 * * *", () => {
   // note: if (cron1){cron1.destroy()} doesn't work, causes too many schedules to start still
   cron1.destroy();
-  let randomCronNum = (Math.floor(Math.random() * 13) + 10).toString();
+  var randomCronNum = (Math.floor(Math.random() * 13) + 10).toString();
+  console.log("before reminder: " + randomCronNum);
 
-  // remind users to drink water once every day at a random hour between 10am and 10pm (10-22)
+  // remind users to drink water once every day at a ranom hour between 10am and 10pm
   cron1 = cron.schedule(
     `0 ${randomCronNum} * * *`,
     () => {
@@ -78,26 +79,32 @@ const play = async (connection, message) => {
     }
   });
 };
-
 // ---------------------------------------------------------------------------------------
 
 // Main Music Command
+
 let musicQueue = [];
 
-let ytRegex = /(^(http|https):\/\/((www|m)\.youtube\.com\/(watch\?v=)|(youtu\.be\/))[a-zA-Z0-9_-]{11}$)/;
+let ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be).*)/;
 
 bot.on("message", async (message) => {
   if (message.content.charAt(0) === process.env.PREFIX) {
     let args = message.content.substring(process.env.PREFIX.length).split(" ");
 
-    let ytGrab = args.find((element) => {
-      return ytRegex.test(element);
-    });
-
     //check if channel name exists in voice channel list
     let channelExists = message.guild.channels.cache.some((channel) => {
       return channel.type === "voice" && message.content.includes(channel.name);
     });
+
+    // grab yt link
+    const ytGrab = args.find((element) => {
+      return ytRegex.test(element);
+    });
+
+    // push music to corresponding guild
+    const pushMusicToGuild = (guildName) => {
+      guildName.queue.push(ytGrab);
+    };
 
     //if one of the guild channel names exist in the string, extract it.
     let voiceChannelName = "";
@@ -112,11 +119,64 @@ bot.on("message", async (message) => {
       });
     }
 
+    // connect to user's current channel and play
+    const playCurrentChannel = async () => {
+      try {
+        const voiceConnection = await message.member.voice.channel.join();
+        await play(voiceConnection, message);
+      } catch (ex) {
+        console.log(ex);
+      }
+    };
+
+    // connect to specified channel in args and play
+    const playSpecificChannel = async () => {
+      try {
+        const voiceConnection = await voiceChannelName.join();
+        await play(voiceConnection, message);
+      } catch (ex) {
+        console.log(ex);
+      }
+    };
+
+    // add to queue
+    const addToQueue = () => {
+      if (message.guild.me.voice.channel) {
+        message.channel.send("Successfully added to the queue!");
+      } else {
+        if (channelExists) {
+          playSpecificChannel();
+        }
+        if (!channelExists) {
+          playCurrentChannel();
+        }
+      }
+    };
+
+    // clear queue and stop play
+    const stopPlay = (guildName) => {
+      // clear music queue
+      guildName.queue = [];
+      // if bot is in a voice channel
+      if (message.guild.me.voice.channel) {
+        // leave current voice channel in current guild
+        message.guild.me.voice.channel.leave();
+      }
+    };
+
+    let guildInMusicQueue = findGuild(musicQueue, message);
+
     switch (args[0]) {
       case "nuggplay":
         //if no second arg or second arg isn't a youtube link
         if (!ytRegex.test(ytGrab)) {
           message.reply("You need to provide a valid Youtube link!");
+          return;
+        }
+
+        // if channel name in args is invalid
+        if (args.length > 2 && !channelExists) {
+          message.reply("Invalid channel name, type !nugghelp for more info.");
           return;
         }
 
@@ -131,101 +191,54 @@ bot.on("message", async (message) => {
           return element.guild === message.guild.id;
         });
 
-        // TO BE ADDED: if url exists
-
-        //if the guild doesn't exist, add it and push the current
+        //if the guild doesn't exist in the music queue, add it and push the current track
         if (!guildExists) {
           musicQueue.push({ guild: message.guild.id, queue: [] });
-          let guildInMusicQueue = findGuild(musicQueue, message);
-          guildInMusicQueue.queue.push(ytGrab);
-
-          if (message.guild.me.voice.channel) {
-            console.log("Connection exists!");
-            message.channel.send("Successfully added to the queue!");
-          } else {
-            if (channelExists) {
-              try {
-                const voiceConnection = await voiceChannelName.join();
-                await play(voiceConnection, message);
-              } catch (ex) {
-                console.log(ex);
-              }
-            }
-            if (!channelExists) {
-              try {
-                const voiceConnection2 = await message.member.voice.channel.join();
-                await play(voiceConnection2, message);
-              } catch (ex) {
-                console.log(ex);
-              }
-            }
-          }
+          // must create newGuild var after pushing to music queue
+          // or pushMusicToGuild() function will not find a guild
+          let newGuild = findGuild(musicQueue, message);
+          pushMusicToGuild(newGuild);
+          addToQueue();
         }
         if (guildExists) {
-          let guildInMusicQueue = findGuild(musicQueue, message);
-          guildInMusicQueue.queue.push(ytGrab);
-
-          if (message.guild.me.voice.channel) {
-            console.log("Connection exists!");
-            message.channel.send("Successfully added to the queue!");
-          } else {
-            if (channelExists) {
-              try {
-                const voiceConnection = await voiceChannelName.join();
-                await play(voiceConnection, message);
-              } catch (ex) {
-                console.log(ex);
-              }
-            }
-            if (!channelExists) {
-              try {
-                const voiceConnection2 = await message.member.voice.channel.join();
-                await play(voiceConnection2, message);
-              } catch (ex) {
-                console.log(ex);
-              }
-            }
-          }
+          pushMusicToGuild(guildInMusicQueue);
+          addToQueue();
         }
-        // console.log("musicQueue: ");
-        // console.log(musicQueue);
         break;
       case "nuggskip":
-        let guildInMusicQueue = findGuild(musicQueue, message);
-        //if last item or empty queue, disconnect
-        if (guildInMusicQueue.queue.length <= 1) {
-          guildInMusicQueue.queue = [];
-          message.guild.me.voice.channel.leave();
+        if (!guildInMusicQueue) {
+          console.log("No tracks in the queue.");
+          message.channel.send("There are no tracks currently in the queue!");
+        }
+        // if there is one song left, clear queue and leave voice chat
+        else if (guildInMusicQueue.queue.length == 1) {
+          console.log("Skipped last song in the queue");
+          message.channel.send("No tracks left in the queue, disconnecting.");
+          stopPlay(guildInMusicQueue);
         } else {
           //remove first element in queue
           guildInMusicQueue.queue.shift();
-          //play next song
+          //play next track
           message.member.voice.channel.join().then((connection) => {
             play(connection, message);
           });
+          message.channel.send("Skipping to the next track...");
         }
         break;
       case "nuggstop":
         console.log("nuggstop");
-        let guildInMusicQueue2 = findGuild(musicQueue, message);
-        // clear music queue
-        guildInMusicQueue2.queue = [];
-        // if bot is in a voice channel
-        if (message.guild.me.voice.channel) {
-          // leave current voice channel in current guild
-          message.guild.me.voice.channel.leave();
-          message.channel.send("NuggetBot disconnected.");
-        }
+        stopPlay(guildInMusicQueue);
+        message.channel.send("NuggetBot disconnected.");
         break;
       case "nugghelp":
         const msg = new Discord.MessageEmbed()
           .setTitle("NuggetBot Valid Commands:")
           .setColor(0xffc300).setDescription(`
-        -- !nuggplay <Youtube Link> -- to play audio in your current voice channel
-        -- !nuggplay <Channel Name> <Youtube Link> -- to play audio in a channel without being in the channel yourself
-        -- !nuggskip -- skip the current track
-        -- !nuggstop -- to disconnect the bot from the voice channel
-        -- !secret -- show secret/hidden commands
+        -- !nuggplay <Youtube Link> -- Play audio in your current voice channel
+        -- !nuggplay <Channel Name> <Youtube Link> -- Play audio in a specific channel (NOTE: channel name is case sensitive)
+        -- !nuggskip -- Skip the current track (disconnects if no tracks left)
+        -- !nuggstop -- Disconnect the bot from the channel and clear the queue
+        -- !secret -- Show secret/hidden commands
       `);
         message.channel.send(msg);
         break;
@@ -233,8 +246,9 @@ bot.on("message", async (message) => {
   }
 });
 
-// Secret Commands
+// Secrets
 bot.on("message", (message) => {
+  // no command for sdb, works if regex is found in any message
   let sdbRegex = /(sdb)|(shit damn boys)/;
 
   if (sdbRegex.test(message.content)) {
@@ -243,6 +257,7 @@ bot.on("message", (message) => {
     });
   }
 
+  // Secret Commands
   if (message.content.charAt(0) === "!") {
     let args = message.content.substring(process.env.PREFIX.length).split(" ");
 
