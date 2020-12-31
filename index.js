@@ -62,7 +62,7 @@ const play = async (connection, message) => {
   let playServer = findGuild(musicQueue, message);
 
   playServer.dispatcher = connection.play(
-    ytdl(playServer.queue[0], { filter: "audioonly" })
+    ytdl(playServer.queue[0].yt, { filter: "audioonly" })
   );
 
   playServer.dispatcher.on("finish", function () {
@@ -101,12 +101,7 @@ bot.on("message", async (message) => {
       return ytRegex.test(element);
     });
 
-    // push music to corresponding guild
-    const pushMusicToGuild = (guildName) => {
-      guildName.queue.push(ytGrab);
-    };
-
-    //if one of the guild channel names exist in the string, extract it.
+    //if one of the guild channel names exist in the string, extract it
     let voiceChannelName = "";
     if (channelExists) {
       voiceChannelName = message.guild.channels.cache.find((channel) => {
@@ -119,6 +114,12 @@ bot.on("message", async (message) => {
       });
     }
 
+    // push music to corresponding guild
+    const pushMusicToGuild = (guildName, channelName) => {
+      guildName.queue.push({ yt: ytGrab, channel: channelName });
+      console.log(guildName.queue);
+    };
+
     // connect to user's current channel and play
     const playCurrentChannel = async () => {
       try {
@@ -130,9 +131,9 @@ bot.on("message", async (message) => {
     };
 
     // connect to specified channel in args and play
-    const playSpecificChannel = async () => {
+    const playSpecificChannel = async (channelName) => {
       try {
-        const voiceConnection = await voiceChannelName.join();
+        const voiceConnection = await channelName.join();
         await play(voiceConnection, message);
       } catch (ex) {
         console.log(ex);
@@ -145,7 +146,7 @@ bot.on("message", async (message) => {
         message.channel.send("Successfully added to the queue!");
       } else {
         if (channelExists) {
-          playSpecificChannel();
+          playSpecificChannel(voiceChannelName);
         }
         if (!channelExists) {
           playCurrentChannel();
@@ -197,11 +198,11 @@ bot.on("message", async (message) => {
           // must create newGuild var after pushing to music queue
           // or pushMusicToGuild() function will not find a guild
           let newGuild = findGuild(musicQueue, message);
-          pushMusicToGuild(newGuild);
+          pushMusicToGuild(newGuild, voiceChannelName);
           addToQueue();
         }
         if (guildExists) {
-          pushMusicToGuild(guildInMusicQueue);
+          pushMusicToGuild(guildInMusicQueue, voiceChannelName);
           addToQueue();
         }
         break;
@@ -218,10 +219,16 @@ bot.on("message", async (message) => {
         } else {
           //remove first element in queue
           guildInMusicQueue.queue.shift();
+
           //play next track
-          message.member.voice.channel.join().then((connection) => {
-            play(connection, message);
-          });
+          if (guildInMusicQueue.queue[0].channel != "") {
+            playSpecificChannel(guildInMusicQueue.queue[0].channel);
+          } else {
+            playCurrentChannel();
+          }
+          // message.member.voice.channel.join().then((connection) => {
+          //   play(connection, message);
+          // });
           message.channel.send("Skipping to the next track...");
         }
         break;
