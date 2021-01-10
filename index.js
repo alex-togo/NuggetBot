@@ -16,6 +16,10 @@ bot.on("ready", () => {
   console.log("NuggetBot is online!");
 });
 
+bot.on("shardError", (error) => {
+  console.error("A websocket connection encountered an error:", error);
+});
+
 // Water Reminder
 
 // placeholder var so first cron1.destroy() works
