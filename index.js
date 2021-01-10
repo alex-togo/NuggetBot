@@ -66,7 +66,10 @@ const play = async (connection, message) => {
   let playServer = findGuild(musicQueue, message);
 
   playServer.dispatcher = connection.play(
-    ytdl(playServer.queue[0].yt, { filter: "audioonly" })
+    ytdl(playServer.queue[0].yt, {
+      highWaterMark: 1 << 25,
+      filter: "audioonly",
+    })
   );
 
   playServer.dispatcher.on("finish", function () {
