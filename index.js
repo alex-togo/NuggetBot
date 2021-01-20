@@ -12,6 +12,11 @@ const waterImg = new Discord.MessageAttachment(
 
 const sdbImg = new Discord.MessageAttachment("./images/sdb.jpg", "sdb.jpg");
 
+const spookImg = new Discord.MessageAttachment(
+  "./images/spook.png",
+  "spook.png"
+);
+
 bot.on("ready", () => {
   console.log("NuggetBot is online!");
 });
@@ -43,9 +48,18 @@ cron.schedule("0 0 * * *", () => {
       // user role to message
       const roleId = process.env.ROLE;
 
-      channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
-        files: [waterImg],
-      });
+      // channel.send(`<@&${roleId}> \nDRINK UP HYDRO HOMIES`, {
+      //   files: [waterImg],
+      // });
+
+      const waterEmbed = {
+        title: "💦 DRINK UP HYDRO HOMIES 💦",
+        image: {
+          url: "attachment://drink-water.png",
+        },
+      };
+
+      channel.send(`<@&${roleId}>`, { files: [waterImg], embed: waterEmbed });
     },
     { timezone: "America/New_York" }
   );
@@ -65,7 +79,7 @@ const findGuild = (arr, message) => {
 const play = async (connection, message) => {
   let playServer = findGuild(musicQueue, message);
 
-  playServer.dispatcher = connection.play(
+  playServer.dispatcher = await connection.play(
     ytdl(playServer.queue[0].yt, {
       highWaterMark: 1 << 25,
       filter: "audioonly",
@@ -279,10 +293,24 @@ bot.on("message", (message) => {
       case "mufasa":
         message.channel.send("https://www.youtube.com/watch?v=1AnG04qnLqI");
         break;
+      case "spooky":
+        const spookEmbed = {
+          title: "YOU HAVE BEEN VISITED BY THE GHOST OF ROBBIE",
+          image: {
+            url: "attachment://spook.png",
+          },
+        };
+
+        message.reply({ files: [spookImg], embed: spookEmbed });
+        break;
       case "secret":
-        message.reply(
-          "LOL you thought I would just give you all the secret commands?"
-        );
+        const msg = new Discord.MessageEmbed()
+          .setTitle("NuggetBot Valid Commands:")
+          .setColor(0xffc300).setDescription(`
+        -- !mufasa -- IT'S FRIDAY THENNN
+        -- !spooky -- posts an ultra spooky image (not for the faint of heart)
+      `);
+        message.channel.send(msg);
         break;
     }
   }
