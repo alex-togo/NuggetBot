@@ -277,6 +277,7 @@ bot.on("message", async (message) => {
         -- !nuggplay <Youtube Link> -- Play audio in your current voice channel
         -- !nuggplay <Channel Name> <Youtube Link> -- Play audio in a specific channel (NOTE: channel name is case sensitive)
         -- !nuggskip -- Skip the current track (disconnects if no tracks left)
+        -- !nuggqueue -- shows the title of songs currently in the queue
         -- !nuggstop -- Disconnect the bot from the channel and clear the queue
         -- !secret -- Show secret/hidden commands
       `);
