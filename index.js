@@ -262,20 +262,15 @@ bot.on("message", async (message) => {
         break;
       case "nuggqueue":
         let guildName = findGuild(musicQueue, message);
+        if (!guildInMusicQueue) {
+          message.channel.send("No tracks currently in the queue.");
+          return;
+        }
         if (guildInMusicQueue) {
-          // console.log(guildName.queue);
           let arr = [];
-          // for (let i = 0; i < guildName.queue.length; i++) {
-          //   ytdl.getInfo(guildName.queue[i].yt).then((info) => {
-          //     // console.log(info.videoDetails);
-          //     console.log(info.videoDetails.title);
-          //     arr.push(info.videoDetails.title);
-          //     console.log("inside", arr);
-          //   });
-          // }
 
-          guildName.queue.forEach((url) => {
-            arr.push(ytdl.getInfo(url.yt));
+          guildName.queue.forEach((obj) => {
+            arr.push(ytdl.getInfo(obj.yt));
           });
 
           Promise.all(arr).then((arr) => {
@@ -283,16 +278,7 @@ bot.on("message", async (message) => {
               message.channel.send(i + 1 + ". " + arr[i].videoDetails.title);
             }
           });
-
-          // for (let i = 0; i < arr.length; i++) {
-          //   message.channel.send(arr[i]);
-          // }
-
-          // for (let i = 0; i < guildName.queue.length; i++) {
-          //   ytdl.getInfo(guildName.queue[i].yt).then((info) => {
-          //     message.channel.send(i + 1 + ". " + info.videoDetails.title);
-          //   });
-          // }
+          return;
         }
         break;
       case "nugghelp":
@@ -302,7 +288,7 @@ bot.on("message", async (message) => {
         -- !nuggplay <Youtube Link> -- Play audio in your current voice channel
         -- !nuggplay <Channel Name> <Youtube Link> -- Play audio in a specific channel (NOTE: channel name is case sensitive)
         -- !nuggskip -- Skip the current track (disconnects if no tracks left)
-        -- !nuggqueue -- shows the title of songs currently in the queue
+        -- !nuggqueue -- Shows the title of songs currently in the queue
         -- !nuggstop -- Disconnect the bot from the channel and clear the queue
         -- !secret -- Show secret/hidden commands
       `);
