@@ -263,11 +263,36 @@ bot.on("message", async (message) => {
       case "nuggqueue":
         let guildName = findGuild(musicQueue, message);
         if (guildInMusicQueue) {
-          for (let i = 0; i < guildName.queue.length; i++) {
-            ytdl.getBasicInfo(guildName.queue[i].yt).then((info) => {
-              message.channel.send(info.videoDetails.title);
-            });
-          }
+          // console.log(guildName.queue);
+          let arr = [];
+          // for (let i = 0; i < guildName.queue.length; i++) {
+          //   ytdl.getInfo(guildName.queue[i].yt).then((info) => {
+          //     // console.log(info.videoDetails);
+          //     console.log(info.videoDetails.title);
+          //     arr.push(info.videoDetails.title);
+          //     console.log("inside", arr);
+          //   });
+          // }
+
+          guildName.queue.forEach((url) => {
+            arr.push(ytdl.getInfo(url.yt));
+          });
+
+          Promise.all(arr).then((arr) => {
+            for (let i = 0; i < arr.length; i++) {
+              message.channel.send(i + 1 + ". " + arr[i].videoDetails.title);
+            }
+          });
+
+          // for (let i = 0; i < arr.length; i++) {
+          //   message.channel.send(arr[i]);
+          // }
+
+          // for (let i = 0; i < guildName.queue.length; i++) {
+          //   ytdl.getInfo(guildName.queue[i].yt).then((info) => {
+          //     message.channel.send(i + 1 + ". " + info.videoDetails.title);
+          //   });
+          // }
         }
         break;
       case "nugghelp":
