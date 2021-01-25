@@ -231,32 +231,44 @@ bot.on("message", async (message) => {
         if (!guildInMusicQueue) {
           console.log("No tracks in the queue.");
           message.channel.send("There are no tracks currently in the queue!");
+          return;
         }
         // if there is one song left, clear queue and leave voice chat
-        else if (guildInMusicQueue.queue.length == 1) {
+        if (guildInMusicQueue.queue.length == 1) {
           console.log("Skipped last song in the queue");
           message.channel.send("No tracks left in the queue, disconnecting.");
           stopPlay(guildInMusicQueue);
-        } else {
-          //remove first element in queue
-          guildInMusicQueue.queue.shift();
-
-          //play next track
-          if (guildInMusicQueue.queue[0].channel != "") {
-            playSpecificChannel(guildInMusicQueue.queue[0].channel);
-          } else {
-            playCurrentChannel();
-          }
-          // message.member.voice.channel.join().then((connection) => {
-          //   play(connection, message);
-          // });
-          message.channel.send("Skipping to the next track...");
+          return;
         }
+        //remove first element in queue
+        guildInMusicQueue.queue.shift();
+
+        //play next track
+        if (guildInMusicQueue.queue[0].channel != "") {
+          playSpecificChannel(guildInMusicQueue.queue[0].channel);
+        } else {
+          playCurrentChannel();
+        }
+        // message.member.voice.channel.join().then((connection) => {
+        //   play(connection, message);
+        // });
+        message.channel.send("Skipping to the next track...");
+
         break;
       case "nuggstop":
         console.log("nuggstop");
         stopPlay(guildInMusicQueue);
         message.channel.send("NuggetBot disconnected.");
+        break;
+      case "nuggqueue":
+        let guildName = findGuild(musicQueue, message);
+        if (guildInMusicQueue) {
+          for (let i = 0; i < guildName.queue.length; i++) {
+            ytdl.getBasicInfo(guildName.queue[0].yt).then((info) => {
+              message.channel.send(info.videoDetails.title);
+            });
+          }
+        }
         break;
       case "nugghelp":
         const msg = new Discord.MessageEmbed()
@@ -305,7 +317,7 @@ bot.on("message", (message) => {
         break;
       case "secret":
         const msg = new Discord.MessageEmbed()
-          .setTitle("NuggetBot Valid Commands:")
+          .setTitle("NuggetBot Secret Commands:")
           .setColor(0xffc300).setDescription(`
         -- !mufasa -- IT'S FRIDAY THENNN
         -- !spooky -- posts an ultra spooky image (not for the faint of heart)
