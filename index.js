@@ -264,7 +264,7 @@ bot.on("message", async (message) => {
         let guildName = findGuild(musicQueue, message);
         if (guildInMusicQueue) {
           for (let i = 0; i < guildName.queue.length; i++) {
-            ytdl.getBasicInfo(guildName.queue[0].yt).then((info) => {
+            ytdl.getBasicInfo(guildName.queue[i].yt).then((info) => {
               message.channel.send(info.videoDetails.title);
             });
           }
