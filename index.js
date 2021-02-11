@@ -79,12 +79,10 @@ const findGuild = (arr, message) => {
 const play = async (connection, message) => {
   let playServer = findGuild(musicQueue, message);
 
-  playServer.dispatcher = await connection.play(
-    ytdl(playServer.queue[0].yt, {
-      highWaterMark: 1 << 25,
-      filter: "audioonly",
-    })
-  );
+  playServer.dispatcher = await connection.play(ytdl(playServer.queue[0].yt), {
+    highWaterMark: 1 << 25,
+    //   // filter: "audioonly",
+  });
 
   playServer.dispatcher.on("finish", function () {
     // go to next item in queue
