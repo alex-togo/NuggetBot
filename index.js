@@ -79,10 +79,13 @@ const findGuild = (arr, message) => {
 const play = async (connection, message) => {
   let playServer = findGuild(musicQueue, message);
 
-  playServer.dispatcher = await connection.play(ytdl(playServer.queue[0].yt), {
-    highWaterMark: 1 << 25,
-    //   // filter: "audioonly",
-  });
+  playServer.dispatcher = connection.play(
+    ytdl(playServer.queue[0].yt, {
+      // highWaterMark: 1 << 25,
+      filter: "audioonly",
+    }),
+    { seek: 0, volume: 1 }
+  );
 
   playServer.dispatcher.on("finish", function () {
     // go to next item in queue
@@ -143,7 +146,7 @@ bot.on("message", async (message) => {
     const playCurrentChannel = async () => {
       try {
         const voiceConnection = await message.member.voice.channel.join();
-        await play(voiceConnection, message);
+        play(voiceConnection, message);
       } catch (ex) {
         console.log(ex);
       }
@@ -153,7 +156,7 @@ bot.on("message", async (message) => {
     const playSpecificChannel = async (channelName) => {
       try {
         const voiceConnection = await channelName.join();
-        await play(voiceConnection, message);
+        play(voiceConnection, message);
       } catch (ex) {
         console.log(ex);
       }
