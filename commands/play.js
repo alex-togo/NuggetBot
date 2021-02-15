@@ -210,7 +210,12 @@ module.exports = {
     }
     if (cmd === "nuggplr" || cmd === "nuggplayrandom") {
       const videoFinder = async (query) => {
-        const videoResult = await ytSearch(query);
+        try {
+          const videoResult = await ytSearch(query);
+        } catch (ex) {
+          console.log(ex);
+          return [];
+        }
 
         //can add embed here and give user option to choose from many videos
         return videoResult.videos.length > 1 ? videoResult.videos[0] : null;
