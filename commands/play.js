@@ -43,7 +43,6 @@ module.exports = {
     // push music to corresponding guild
     const pushMusicToGuild = (guildName, channelName) => {
       guildName.queue.push({ yt: ytGrab, channel: channelName });
-      console.log(guildName.queue);
     };
 
     // connect to user's current channel and play
@@ -116,11 +115,12 @@ module.exports = {
       if (!ytdl.validateURL(ytGrab)) {
         // message.reply("You need to provide a valid Youtube link!");
         const videoFinder = async (query) => {
+          const videoResult = [];
           try {
-            const videoResult = await ytSearch(query);
+            videoResult = await ytSearch(query);
           } catch (ex) {
             console.log(ex);
-            return [];
+            return videoResult;
           }
 
           const videoList = [];
@@ -209,11 +209,12 @@ module.exports = {
     }
     if (cmd === "nuggplr" || cmd === "nuggplayrandom") {
       const videoFinder = async (query) => {
+        const videoResult = [];
         try {
-          const videoResult = await ytSearch(query);
+          videoResult = await ytSearch(query);
         } catch (ex) {
           console.log(ex);
-          return [];
+          return videoResult;
         }
 
         //can add embed here and give user option to choose from many videos
