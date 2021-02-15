@@ -115,7 +115,7 @@ module.exports = {
       if (!ytdl.validateURL(ytGrab)) {
         // message.reply("You need to provide a valid Youtube link!");
         const videoFinder = async (query) => {
-          const videoResult = [];
+          let videoResult = [];
           try {
             videoResult = await ytSearch(query);
           } catch (ex) {
@@ -209,7 +209,7 @@ module.exports = {
     }
     if (cmd === "nuggplr" || cmd === "nuggplayrandom") {
       const videoFinder = async (query) => {
-        const videoResult = [];
+        let videoResult = [];
         try {
           videoResult = await ytSearch(query);
         } catch (ex) {
