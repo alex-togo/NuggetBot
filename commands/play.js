@@ -289,17 +289,17 @@ module.exports = {
         return;
       }
       if (guildInMusicQueue) {
-        let arr = [];
+        const videoResults = await Promise.all(
+          guildName.queue.map(({ yt }) => ytdl.getInfo(yt))
+        );
 
-        guildName.queue.forEach((obj) => {
-          arr.push(ytdl.getInfo(obj.yt));
-        });
+        //object destructuring: get title from videodetails
+        const videoTitles = videoResults
+          .map(({ videoDetails: { title } }, i) => i + 1 + ". " + title)
+          .join("\n");
 
-        Promise.all(arr).then((arr) => {
-          for (let i = 0; i < arr.length; i++) {
-            message.channel.send(i + 1 + ". " + arr[i].videoDetails.title);
-          }
-        });
+        message.channel.send(videoTitles);
+
         return;
       }
     }
