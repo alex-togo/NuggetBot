@@ -1,3 +1,3 @@
 module.exports = () => {
-  console.log("TestBot is online!");
+  console.log("NuggetBot is online!");
 };

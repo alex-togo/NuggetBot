@@ -66,10 +66,10 @@ module.exports = {
       }
     };
 
-    // add to queue
+    // add to queue message, else play
     const addToQueue = () => {
       if (message.guild.me.voice.channel) {
-        message.channel.send("Successfully added to the queue!");
+        message.channel.send(`Successfully added to the queue!`);
       } else {
         if (channelExists) {
           playSpecificChannel(voiceChannelName);
@@ -116,7 +116,12 @@ module.exports = {
       if (!ytdl.validateURL(ytGrab)) {
         // message.reply("You need to provide a valid Youtube link!");
         const videoFinder = async (query) => {
-          const videoResult = await ytSearch(query);
+          try {
+            const videoResult = await ytSearch(query);
+          } catch (ex) {
+            console.log(ex);
+            return [];
+          }
 
           const videoList = [];
 
@@ -185,20 +190,21 @@ module.exports = {
                 message.channel.send("Timeout");
               });
           });
-        } else if (ytdl.validateURL(ytGrab)) {
-          //if the guild doesn't exist in the music queue, add it and push the current track
-          if (!guildExists) {
-            musicQueue.push({ guild: message.guild.id, queue: [] });
-            // must create newGuild var after pushing to music queue
-            // or pushMusicToGuild() function will not find a guild
-            let newGuild = findGuild(musicQueue, message);
-            pushMusicToGuild(newGuild, voiceChannelName);
-            addToQueue();
-          }
-          if (guildExists) {
-            pushMusicToGuild(guildInMusicQueue, voiceChannelName);
-            addToQueue();
-          }
+        }
+      } else {
+        console.log("in url part");
+        //if the guild doesn't exist in the music queue, add it and push the current track
+        if (!guildExists) {
+          musicQueue.push({ guild: message.guild.id, queue: [] });
+          // must create newGuild var after pushing to music queue
+          // or pushMusicToGuild() function will not find a guild
+          let newGuild = findGuild(musicQueue, message);
+          pushMusicToGuild(newGuild, voiceChannelName);
+          addToQueue();
+        }
+        if (guildExists) {
+          pushMusicToGuild(guildInMusicQueue, voiceChannelName);
+          addToQueue();
         }
       }
     }
