@@ -79,9 +79,9 @@ const findGuild = (arr, message) => {
 const play = async (connection, message) => {
   let playServer = findGuild(musicQueue, message);
 
-  playServer.dispatcher = connection.play(
+  playServer.dispatcher = await connection.play(
     ytdl(playServer.queue[0].yt, {
-      // highWaterMark: 1 << 25,
+      highWaterMark: 1 << 25,
       filter: "audioonly",
     }),
     { seek: 0, volume: 1 }
@@ -107,7 +107,7 @@ const play = async (connection, message) => {
 
 let musicQueue = [];
 
-let ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be).*)/;
+//let ytRegex = /(^(http|https):\/\/(www.)?(youtube.com|youtu.be).*)/;
 
 bot.on("message", async (message) => {
   if (message.content.charAt(0) === process.env.PREFIX) {
@@ -119,8 +119,8 @@ bot.on("message", async (message) => {
     });
 
     // grab yt link
-    const ytGrab = args.find((element) => {
-      return ytRegex.test(element);
+    const ytGrab = args.find((url) => {
+      return ytdl.validateURL(url);
     });
 
     //if one of the guild channel names exist in the string, extract it
@@ -192,7 +192,7 @@ bot.on("message", async (message) => {
     switch (args[0]) {
       case "nuggplay":
         //if no second arg or second arg isn't a youtube link
-        if (!ytRegex.test(ytGrab)) {
+        if (!ytdl.validateURL(ytGrab)) {
           message.reply("You need to provide a valid Youtube link!");
           return;
         }
