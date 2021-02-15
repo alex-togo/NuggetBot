@@ -192,7 +192,6 @@ module.exports = {
           });
         }
       } else {
-        console.log("in url part");
         //if the guild doesn't exist in the music queue, add it and push the current track
         if (!guildExists) {
           musicQueue.push({ guild: message.guild.id, queue: [] });
