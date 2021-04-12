@@ -348,7 +348,11 @@ const play = async (connection, message) => {
   await message.channel.send(
     `Now playing ${info.videoDetails.title} (${Math.round(
       info.videoDetails.lengthSeconds / 60
-    )}:${info.videoDetails.lengthSeconds % 60})`
+    )}:${
+      info.videoDetails.lengthSeconds % 60 < 10
+        ? "0" + (info.videoDetails.lengthSeconds % 60)
+        : info.videoDetails.lengthSeconds % 60
+    })`
   );
 
   playServer.dispatcher.on("finish", function () {
