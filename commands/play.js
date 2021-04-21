@@ -15,6 +15,7 @@ module.exports = {
     "nuggpl",
     "nuggplr",
     "nuggplayrandom",
+    "nuggcurrent",
   ],
   async execute(message, args, cmd, client, Discord) {
     //check if channel name exists in voice channel list
@@ -66,9 +67,9 @@ module.exports = {
     };
 
     // add to queue message, else play
-    const addToQueue = () => {
+    const addToQueue = (title) => {
       if (message.guild.me.voice.channel) {
-        message.channel.send(`Successfully added to the queue!`);
+        message.channel.send(`Successfully added ${title} the queue!`);
       } else {
         if (channelExists) {
           playSpecificChannel(voiceChannelName);
@@ -91,6 +92,14 @@ module.exports = {
     };
 
     let guildInMusicQueue = findGuild(musicQueue, message);
+
+    if (cmd === "nuggcurrent") {
+      console.log(guildInMusicQueue.queue[0].yt);
+      let info = await ytdl.getInfo(guildInMusicQueue.queue[0].yt);
+      message.channel.send(
+        `Current track: ${info.videoDetails.title}\nLink: ${guildInMusicQueue.queue[0].yt}`
+      );
+    }
 
     if (cmd === "nuggplay" || cmd === "nuggpl") {
       //if no second arg or second arg isn't a youtube link
@@ -162,7 +171,7 @@ module.exports = {
                 time: 30000,
                 errors: ["time"],
               })
-              .then(async (message) => {
+              .then((message) => {
                 message = message.first();
                 let num = parseInt(message.content);
                 if (num >= 1 && num <= 5) {
@@ -175,23 +184,25 @@ module.exports = {
                       yt: videos[num - 1].url,
                       channel: message.member.voice.channel,
                     });
-                    addToQueue();
+                    addToQueue(videos[num - 1].title);
                   }
                   if (guildExists) {
                     guildInMusicQueue.queue.push({
                       yt: videos[num - 1].url,
                       channel: message.member.voice.channel,
                     });
-                    addToQueue();
+                    addToQueue(videos[num - 1].title);
                   }
                 }
               })
               .catch((e) => {
-                message.channel.send("Timeout");
+                message.channel.send(`${e}`);
               });
           });
         }
       } else {
+        // get video info to use title when adding to queue
+        let info = await ytdl.getInfo(args);
         //if the guild doesn't exist in the music queue, add it and push the current track
         if (!guildExists) {
           musicQueue.push({ guild: message.guild.id, queue: [] });
@@ -199,11 +210,11 @@ module.exports = {
           // or pushMusicToGuild() function will not find a guild
           let newGuild = findGuild(musicQueue, message);
           pushMusicToGuild(newGuild, voiceChannelName);
-          addToQueue();
+          addToQueue(info.videoDetails.title);
         }
         if (guildExists) {
           pushMusicToGuild(guildInMusicQueue, voiceChannelName);
-          addToQueue();
+          addToQueue(info.videoDetails.title);
         }
       }
     }
@@ -237,14 +248,14 @@ module.exports = {
             yt: video.url,
             channel: message.member.voice.channel,
           });
-          addToQueue();
+          addToQueue(video.videoDetails.title);
         }
         if (guildExists) {
           guildInMusicQueue.queue.push({
             yt: video.url,
             channel: message.member.voice.channel,
           });
-          addToQueue();
+          addToQueue(video.videoDetails.title);
         }
       } else {
         message.channel.send("No video results found");
@@ -304,21 +315,6 @@ module.exports = {
         return;
       }
     }
-    // if (cmd === "nugghelp") {
-    //   const msg = new Discord.MessageEmbed()
-    //     .setTitle("NuggetBot Valid Commands:")
-    //     .setColor(0xffc300).setDescription(`
-    //       -- !nuggplay <Youtube Link> -- Play audio in your current voice channel
-    //       -- !nuggplay <Channel Name> <Youtube Link> -- Play audio in a specific channel (NOTE: channel name is case sensitive)
-    //       -- !nuggplay <user input text> -- Lists 5 of the top results from youtube based off your input
-    //       -- !nuggplr <user input text> -- Plays the top youtube result based off your input
-    //       -- !nuggskip -- Skip the current track (disconnects if no tracks left)
-    //       -- !nuggqueue -- Shows the title of songs currently in the queue
-    //       -- !nuggstop -- Disconnect the bot from the channel and clear the queue
-    //       -- !secret -- Show secret/hidden commands
-    //     `);
-    //   message.channel.send(msg);
-    // }
   },
 };
 
@@ -326,10 +322,9 @@ module.exports = {
 
 // finds the corresponding guild in the array
 const findGuild = (arr, message) => {
-  let result = arr.find((element) => {
+  return arr.find((element) => {
     return element.guild === message.guild.id;
   });
-  return result;
 };
 
 // play audio
