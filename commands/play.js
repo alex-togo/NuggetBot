@@ -107,7 +107,7 @@ module.exports = {
         return;
       }
 
-      // return true if if guild already exists in the array
+      // return true if guild already exists in the array
       let guildExists = musicQueue.some((element) => {
         return element.guild === message.guild.id;
       });
@@ -346,12 +346,12 @@ const play = async (connection, message) => {
 
   const info = await ytdl.getInfo(playServer.queue[0].yt);
   await message.channel.send(
-    `Now playing ${info.videoDetails.title} (${Math.round(
+    `Now playing ${info.videoDetails.title} (${Math.floor(
       info.videoDetails.lengthSeconds / 60
     )}:${
       info.videoDetails.lengthSeconds % 60 < 10
-        ? "0" + (info.videoDetails.lengthSeconds % 60)
-        : info.videoDetails.lengthSeconds % 60
+        ? "0" + Math.floor(info.videoDetails.lengthSeconds % 60)
+        : Math.floor(info.videoDetails.lengthSeconds % 60)
     })`
   );
 

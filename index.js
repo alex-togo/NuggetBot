@@ -24,7 +24,7 @@ client.on("shardError", (error) => {
 
 // placeholder var so first cron1.destroy() works
 var cron1 = cron.schedule("0 0 * * *", () => {
-  console.log("placeholder started");
+  console.log("placeholder cron started");
 });
 
 // generate random hour between 10-22 for the water reminder cron job at 12am every day
@@ -32,7 +32,7 @@ cron.schedule("0 0 * * *", () => {
   // note: if (cron1){cron1.destroy()} doesn't work, causes too many schedules to start still
   cron1.destroy();
   var randomCronNum = (Math.floor(Math.random() * 13) + 10).toString();
-  console.log("before reminder: " + randomCronNum);
+  //console.log("before reminder: " + randomCronNum);
 
   // remind users to drink water once every day at a ranom hour between 10am and 10pm
   cron1 = cron.schedule(
