@@ -94,13 +94,13 @@ module.exports = {
     let guildInMusicQueue = findGuild(musicQueue, message);
 
     if (cmd === "nuggcurrent") {
-      if (guildInMusicQueue) {
-        console.log(guildInMusicQueue.queue[0].yt);
+      try {
         let info = await ytdl.getInfo(guildInMusicQueue.queue[0].yt);
+        console.log("info: " + info);
         message.channel.send(
           `Current track: ${info.videoDetails.title}\nLink: ${guildInMusicQueue.queue[0].yt}`
         );
-      } else {
+      } catch (e) {
         message.channel.send("No tracks currently playing.");
       }
     }
