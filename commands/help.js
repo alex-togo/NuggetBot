@@ -13,6 +13,7 @@ module.exports = {
                 -- !nuggskip -- Skip the current track (disconnects if no tracks left)
                 -- !nuggqueue -- Shows the title of songs currently in the queue
                 -- !nuggstop -- Disconnect the bot from the channel and clear the queue
+                -- !nuggcurrent -- shows the title and url of the current track playing
                 -- !secret -- Show secret/hidden commands
               `);
       message.channel.send(msg);
