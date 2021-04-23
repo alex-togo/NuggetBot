@@ -96,7 +96,6 @@ module.exports = {
     if (cmd === "nuggcurrent") {
       try {
         let info = await ytdl.getInfo(guildInMusicQueue.queue[0].yt);
-        console.log("info: " + info);
         message.channel.send(
           `Current track: ${info.videoDetails.title}\nLink: ${guildInMusicQueue.queue[0].yt}`
         );
@@ -206,7 +205,7 @@ module.exports = {
         }
       } else {
         // get video info to use title when adding to queue
-        let info = await ytdl.getInfo(args);
+        let info = await ytdl.getInfo(ytGrab);
         //if the guild doesn't exist in the music queue, add it and push the current track
         if (!guildExists) {
           musicQueue.push({ guild: message.guild.id, queue: [] });
