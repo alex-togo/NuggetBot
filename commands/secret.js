@@ -3,11 +3,16 @@ require("dotenv").config({ path: "./config/keys.env" });
 module.exports = {
   name: "secret",
   description: "lists all commands for nuggetbot",
-  aliases: ["spooky", "mufasa"],
+  aliases: ["spooky", "mufasa", "nuggfortune", "cowboy"],
   execute(message, args, cmd, client, Discord) {
     const spookImg = new Discord.MessageAttachment(
       "./images/spook.png",
       "spook.png"
+    );
+
+    const cowboyImg = new Discord.MessageAttachment(
+      "./images/cowboy_text.jpg",
+      "cowboy.jpg"
     );
 
     if (cmd === "secret") {
@@ -20,6 +25,41 @@ module.exports = {
       message.channel.send(msg);
       return;
     }
+    // if (cmd === "nuggfortune") {
+    //   let randomNum = Math.floor(Math.random() * 10) + 1;
+    //   if (
+    //     randomNum === 1 ||
+    //     randomNum === 2 ||
+    //     randomNum === 3 ||
+    //     randomNum === 4
+    //   ) {
+    //     message.reply("test1");
+    //     return;
+    //   }
+    //   if (randomNum === 5 || randomNum === 6 || randomNum === 7) {
+    //     message.reply(
+    //       "test2"
+    //     );
+    //     return;
+    //   }
+    //   if (randomNum === 8 || randomNum === 9) {
+    //     message.reply(
+    //       "test3"
+    //     );
+    //   }
+    //   if (randomNum === 10) {
+    //     message.reply("test4");
+    //     return;
+    //   }
+    // }
+
+    if (cmd === "cowboy") {
+      message.reply({
+        files: [cowboyImg],
+      });
+      return;
+    }
+
     if (cmd === "spooky") {
       const spookEmbed = {
         title: "YOU HAVE BEEN VISITED BY THE GHOST OF ROBBIE",
