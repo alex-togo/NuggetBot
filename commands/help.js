@@ -14,6 +14,7 @@ module.exports = {
                 -- !nuggqueue -- Shows the title of songs currently in the queue
                 -- !nuggstop -- Disconnect the bot from the channel and clear the queue
                 -- !nuggcurrent -- shows the title and url of the current track playing
+                -- !nuggrepost <message> -- posts an alert with your custom message inside
                 -- !secret -- Show secret/hidden commands
               `);
       message.channel.send(msg);

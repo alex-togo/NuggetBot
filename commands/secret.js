@@ -3,7 +3,7 @@ require("dotenv").config({ path: "./config/keys.env" });
 module.exports = {
   name: "secret",
   description: "lists all commands for nuggetbot",
-  aliases: ["spooky", "mufasa", "nuggfortune", "cowboy"],
+  aliases: ["spooky", "mufasa", "nuggfortune", "cowboy", "nuggrepost"],
   execute(message, args, cmd, client, Discord) {
     const spookImg = new Discord.MessageAttachment(
       "./images/spook.png",
@@ -57,6 +57,16 @@ module.exports = {
       message.reply({
         files: [cowboyImg],
       });
+      return;
+    }
+
+    if (cmd === "nuggrepost") {
+      const msg = args.join(" ");
+      message.channel.send(`
+      🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨\nWEE WOO WEE WOO\nALERT!! ALERT!!\n${
+        msg ? msg : "YOU JUST DID SOMETHING VERY BAD!"
+      }\n🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
+      `);
       return;
     }
 
