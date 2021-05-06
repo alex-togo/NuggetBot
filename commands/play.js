@@ -337,6 +337,7 @@ const play = async (connection, message) => {
   playServer.dispatcher = await connection.play(
     ytdl(playServer.queue[0].yt, {
       highWaterMark: 1 << 25,
+      filter: "audioonly",
     }),
     { seek: 0, volume: 1 }
   );
