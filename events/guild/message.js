@@ -15,7 +15,9 @@ module.exports = (Discord, client, message) => {
   try {
     command.execute(message, args, cmd, client, Discord);
   } catch (err) {
-    message.reply("There was an error trying to execute this command.");
+    message.reply(
+      "There was an error trying to execute this command, type !nugghelp for the command list."
+    );
     console.log(err);
   }
 };
