@@ -332,6 +332,12 @@ const findGuild = (arr, message) => {
 
 // play audio
 const play = async (connection, message) => {
+  //console.log(message);
+  let timeRegex = /(?<=\?t\=)\d*/g;
+  let time = message.content.includes("?t=")
+    ? parseInt(message.content.match(timeRegex))
+    : 0;
+  console.log(time);
   let playServer = findGuild(musicQueue, message);
 
   playServer.dispatcher = await connection.play(
@@ -339,7 +345,7 @@ const play = async (connection, message) => {
       highWaterMark: 1 << 25,
       filter: "audioonly",
     }),
-    { seek: 0, volume: 1 }
+    { seek: time, volume: 1 }
   );
 
   const info = await ytdl.getInfo(playServer.queue[0].yt);
