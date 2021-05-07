@@ -83,7 +83,9 @@ module.exports = {
     // clear queue and stop play
     const stopPlay = (guildName) => {
       // clear music queue
-      guildName.queue = [];
+      if (guildName) {
+        guildName.queue = [];
+      }
       // if bot is in a voice channel
       if (message.guild.me.voice.channel) {
         // leave current voice channel in current guild
@@ -332,30 +334,42 @@ const findGuild = (arr, message) => {
 
 // play audio
 const play = async (connection, message) => {
-  //console.log(message);
   let timeRegex = /(?<=\?t\=)\d*/g;
   let time = message.content.includes("?t=")
     ? parseInt(message.content.match(timeRegex))
     : 0;
-  console.log(time);
+
+  //only log time if a timestamp exists (0 means no timestamp)
+  if (time > 0) {
+    console.log("Timestamp: " + time);
+  }
+
   let playServer = findGuild(musicQueue, message);
 
   playServer.dispatcher = await connection.play(
     ytdl(playServer.queue[0].yt, {
       highWaterMark: 1 << 25,
       filter: "audioonly",
+      type: "opus",
     }),
     { seek: time, volume: 1 }
   );
 
   const info = await ytdl.getInfo(playServer.queue[0].yt);
+  //3600 is 1 hour in seconds
   await message.channel.send(
-    `Now playing ${info.videoDetails.title} (${Math.floor(
-      info.videoDetails.lengthSeconds / 60
-    )}:${
+    `Now playing ${info.videoDetails.title} (${
+      info.videoDetails.lengthSeconds > 3599
+        ? Math.floor(info.videoDetails.lengthSeconds / 3600) + ":"
+        : ""
+    }${
+      (info.videoDetails.lengthSeconds % 3600) / 60 < 10
+        ? "0" + Math.floor((info.videoDetails.lengthSeconds % 3600) / 60)
+        : Math.floor((info.videoDetails.lengthSeconds % 3600) / 60)
+    }:${
       info.videoDetails.lengthSeconds % 60 < 10
-        ? "0" + Math.floor(info.videoDetails.lengthSeconds % 60)
-        : Math.floor(info.videoDetails.lengthSeconds % 60)
+        ? "0" + Math.floor((info.videoDetails.lengthSeconds % 3600) % 60)
+        : Math.floor((info.videoDetails.lengthSeconds % 3600) % 60)
     })`
   );
 
