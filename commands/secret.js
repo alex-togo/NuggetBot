@@ -15,6 +15,11 @@ module.exports = {
       "cowboy.jpg"
     );
 
+    const crueltyImg = new Discord.MessageAttachment(
+      "./images/cruelty.jpg",
+      "cruelty.jpg"
+    );
+
     if (cmd === "secret") {
       const msg = new Discord.MessageEmbed()
         .setTitle("NuggetBot Secret Commands:")
@@ -60,11 +65,18 @@ module.exports = {
       return;
     }
 
+    if (cmd === "cruelty") {
+      message.reply({
+        files: [crueltyImg],
+      });
+      return;
+    }
+
     if (cmd === "nuggrepost") {
       const msg = args.join(" ");
       message.channel.send(`
       🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨\nWEE WOO WEE WOO\nALERT!! ALERT!!\n${
-        msg ? msg : "YOU JUST DID SOMETHING VERY BAD!"
+        msg ? msg : "YOU JUST MADE A REPOST"
       }\n🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨
       `);
       return;
