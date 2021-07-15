@@ -3,7 +3,14 @@ require("dotenv").config({ path: "./config/keys.env" });
 module.exports = {
   name: "secret",
   description: "lists all commands for nuggetbot",
-  aliases: ["spooky", "mufasa", "nuggfortune", "cowboy", "nuggrepost"],
+  aliases: [
+    "spooky",
+    "mufasa",
+    "nuggfortune",
+    "cowboy",
+    "nuggrepost",
+    "cruelty",
+  ],
   execute(message, args, cmd, client, Discord) {
     const spookImg = new Discord.MessageAttachment(
       "./images/spook.png",
